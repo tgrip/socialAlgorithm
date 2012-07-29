@@ -1,3 +1,4 @@
+
 __author__ = 'Theo'
 
 # Find Eulerian Tour
@@ -10,17 +11,26 @@ __author__ = 'Theo'
 # For example, if the input graph was
 # [(1, 2), (2, 3), (3, 1)]
 # A possible Eulerian tour would be [1, 2, 3, 1]
+def get_degree(tour):
+    degree = {}
+    for x, y in tour:
+        degree[x] = degree.get(x, 0) + 1
+        degree[y] = degree.get(y, 0) + 1
+    return degree
 
 def find_eulerian_tour(graph):
     # your code here
-    result = []
-    element = graph.pop(0)
+    degree = get_degree(graph)
+    highDegreeNumber = max(degree, key=degree.get)
+    element = filter(lambda el: el[0] == highDegreeNumber, graph)[0]
+    result = [highDegreeNumber]
     last = element[1]
+    visited = []
     while element:
-        result.append(element)
-        #last = lastNumber(result)
-        (element, last) = findInGraph(graph, last, result)
-        print 'next element we search for', element, last
+        visited.append(element)
+        result.append(last)
+        (element, last) = findInGraph(graph, last, visited)
+#        print 'next element we search for', element, last
         #print next
     return result
 
@@ -28,25 +38,25 @@ def findInGraph(graph, startNode, visited):
     nextToVisit = []
     for index, node in enumerate(graph):
         if node not in visited:
-            if startNode == node[0]:
-                nextElement = graph.pop(index)
-                return nextElement, nextElement[1]
-            if startNode == node[1]:
-                nextElement = graph.pop(index)
-                return nextElement, nextElement[0]
-    return 0, 0
+            if startNode in (node[0], node[1]):
+                nextToVisit.append(node)
+    allVisitedElements = []
+    for tuple in visited:
+        allVisitedElements += list(tuple)
+    minCount = 999
+    nextElement = 0
+    nextVal = 0
+    for element in nextToVisit:
+        val = element[0] if element[1] == startNode else element[1]
+        count = allVisitedElements.count(val)
+        if not count:
+            return element, val
+        if count < minCount:
+            minCount = count
+            nextElement = element
+            nextVal = val
+    return nextElement, nextVal
 
-def lastNumber(visited):
-    last = visited[-1]
-    print 'letzter', last
-    if len(visited) == 1:
-        return last[1]
-    vorletzter = visited[-2]
-    print 'vorletzter', vorletzter
-    if vorletzter[1] == last[0]:
-        return last[1]
-    else:
-        return last[0]
 
 print find_eulerian_tour([(1, 2), (2, 3), (3, 1)])
 print
